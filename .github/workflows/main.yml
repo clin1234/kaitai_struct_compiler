@@ -70,47 +70,8 @@ jobs:
           path: "*/target/universal/*.zip"
           if-no-files-found: error
 
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout codilime/kaitai_struct_compiler@hacks/veles
-        uses: actions/checkout@v4
-        with:
-          repository: codilime/kaitai_struct_compiler
-          ref: hacks/veles
-
-      - name: Set up Java 8
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '8'
-
-      - name: Install sbt
-        run: choco install sbt --no-progress -y
-
-      - name: Cache sbt/Ivy artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt', 'project/**/*.scala', 'project/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-sbt-
-
-      - name: Build Windows MSI
-        run: sbt compilerJVM/windows:packageBin
-
-      - name: Upload Windows MSI
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-msi
-          path: "*/target/windows/*.msi"
-          if-no-files-found: error
-
   release:
-    needs: [build-universal, build-windows]
+    needs: [build-universal]
     runs-on: ubuntu-latest
 
     steps:
@@ -128,5 +89,4 @@ jobs:
             Built from [`codilime/kaitai_struct_compiler@hacks/veles`](https://github.com/codilime/kaitai_struct_compiler/tree/hacks/veles).
           files: |
             dist/universal-zip/*.zip
-            dist/windows-msi/*.msi
           token: ${{ secrets.GITHUB_TOKEN }}
