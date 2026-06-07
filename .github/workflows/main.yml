@@ -69,24 +69,3 @@ jobs:
           name: universal-zip
           path: "*/target/universal/*.zip"
           if-no-files-found: error
-
-  release:
-    needs: [build-universal]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.build-universal.outputs.tag }}
-          name: Kaitai Struct Compiler - ${{ needs.build-universal.outputs.tag }}
-          body: |
-            Built from [`codilime/kaitai_struct_compiler@hacks/veles`](https://github.com/codilime/kaitai_struct_compiler/tree/hacks/veles).
-          files: |
-            dist/universal-zip/*.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
